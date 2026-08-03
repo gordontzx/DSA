@@ -37,7 +37,7 @@ private:
     static constexpr char SENTINEL = 'z' + 1;
     string s;
     vector<Node> trie;
-    int nextId = 1;
+    int next_id = 1;
 
     Point go(Point p, int l, int r) {
         while (l < r) {
@@ -64,7 +64,7 @@ private:
         if (p.pos == 0) return trie[p.node].par;
 
         const Node& v = trie[p.node];
-        int mid = nextId++;
+        int mid = next_id++;
         trie.emplace_back(v.l, v.l+p.pos, v.par);
         trie[v.par].next[s[v.l]-'a'] = mid;
 
@@ -77,34 +77,34 @@ private:
 
     void build() {
         int m = s.size();
-        Point activePoint(0, 0);
+        Point active_point(0, 0);
 
         for (int i = 0; i < m; i++) {
-            int lastInserted = -1;
+            int last_inserted = -1;
 
-            Point nextPoint = go(activePoint, i, i+1);
-            if (nextPoint.node != -1) {
-                activePoint = nextPoint;
-                if (lastInserted != -1)
-                    trie[lastInserted].link = trie[nextPoint.node].par;
+            Point next_point = go(active_point, i, i+1);
+            if (next_point.node != -1) {
+                active_point = next_point;
+                if (last_inserted != -1)
+                    trie[last_inserted].link = trie[next_point.node].par;
                 break;
             }
 
-            int oldPar = trie[activePoint.node].par;
-            int mid = split(activePoint);
-            bool isNewNode = mid != oldPar && mid != activePoint.node;
-            int leaf = nextId++;
+            int old_par = trie[active_point.node].par;
+            int mid = split(active_point);
+            bool is_new_node = mid != old_par && mid != active_point.node;
+            int leaf = next_id++;
             trie.emplace_back(i, m, mid);
-            if (lastInserted != -1)
-                trie[lastInserted].link = mid;
-            lastInserted = isNewNode ? mid : -1;
+            if (last_inserted != -1)
+                trie[last_inserted].link = mid;
+            last_inserted = is_new_node ? mid : -1;
 
-            activePoint = go(Point(trie[oldPar].par, trie[trie[oldPar].par].len()), i, i+1);
-            if (activePoint.node == 0) break;
+            active_point = go(Point(trie[old_par].par, trie[trie[old_par].par].len()), i, i+1);
+            if (active_point.node == 0) break;
         }
     }
 
-    string getLabel(int l, int r) {
+    string get_label(int l, int r) {
         string res;
         for (int i = l; i < r; i++) {
             res += s[l] == SENTINEL ? '$' : s[l];
@@ -115,27 +115,27 @@ private:
     void print(int node, string prefix) {
         cout << node << '\n';
 
-        int lastChild = -1;
-        int longestEdge = 0;
+        int last_child = -1;
+        int longest_edge = 0;
         for (int i = 0; i < 27; i++) {
-            int nextId = trie[node].next[i];
-            if (nextId == 0) continue;
-            lastChild = i;
-            longestEdge = trie[nextId].len();
+            int next_id = trie[node].next[i];
+            if (next_id == 0) continue;
+            last_child = i;
+            longest_edge = trie[next_id].len();
         }
 
-        if (lastChild == -1)
+        if (last_child == -1)
             return;
 
         for (int i = 0; i < 27; i++) {
             if (trie[node].next[i] == 0) continue;
-            int nextId = trie[node].next[i];
+            int next_id = trie[node].next[i];
 
-            string rightPadding = repeat("─", longestEdge - trie[nextId].len() + 1);
-            cout << prefix << (i == lastChild ? "└─" : "├─") << getLabel(trie[nextId].l, trie[nextId].r) << rightPadding;
+            string right_padding = repeat("─", longest_edge - trie[next_id].len() + 1);
+            cout << prefix << (i == last_child ? "└─" : "├─") << get_label(trie[next_id].l, trie[next_id].r) << right_padding;
 
-            string nextPrefix = prefix + (i == lastChild ? "│" : "") + string(longestEdge+2, ' ');
-            print(trie[node].next[i], nextPrefix);
+            string next_prefix = prefix + (i == last_child ? "│" : "") + string(longest_edge+2, ' ');
+            print(trie[node].next[i], next_prefix);
         }
     }
 

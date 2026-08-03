@@ -53,63 +53,63 @@ private:
     Compare comp;
     Node* root = nullptr;
 
-    int getHeight(Node* node) {
+    int get_height(Node* node) {
         return node == nullptr ? -1 : node->height;
     }
 
-    void updateHeight(Node* node) {
+    void update_height(Node* node) {
         if (node == nullptr) return;
-        node->height = std::max(getHeight(node->left), getHeight(node->right)) + 1;
+        node->height = std::max(get_height(node->left), get_height(node->right)) + 1;
     }
 
-    int getWeight(Node* node) {
+    int get_weight(Node* node) {
         return node == nullptr ? 0 : node->weight;
     }
 
-    void updateWeight(Node* node) {
+    void update_weight(Node* node) {
         if (node == nullptr) return;
-        node->weight = 1 + getWeight(node->left) + getWeight(node->right);
+        node->weight = 1 + get_weight(node->left) + get_weight(node->right);
     }
 
-    void updateNode(Node* node) {
-        updateHeight(node);
-        updateWeight(node);
+    void update_node(Node* node) {
+        update_height(node);
+        update_weight(node);
     }
 
-    Node* rotateLeft(Node* node) {
-        Node* rightChild = node->right;
+    Node* rotate_left(Node* node) {
+        Node* right_child = node->right;
 
         // rotate
-        node->right = rightChild->left;
-        rightChild->left = node;
+        node->right = right_child->left;
+        right_child->left = node;
 
         // Update heights and weights
-        updateNode(node);
-        updateNode(rightChild);
+        update_node(node);
+        update_node(right_child);
 
-        return rightChild;
+        return right_child;
     }
 
-    Node* rotateRight(Node* node) {
-        Node* leftChild = node->left;
+    Node* rotate_right(Node* node) {
+        Node* left_child = node->left;
 
         // rotate
-        node->left = leftChild->right;
-        leftChild->right = node;
+        node->left = left_child->right;
+        left_child->right = node;
 
         // Update heights and weights
-        updateNode(node);
-        updateNode(leftChild);
+        update_node(node);
+        update_node(left_child);
 
-        return leftChild;
+        return left_child;
     }
 
-    int balanceFactor(Node* node) {
+    int balance_factor(Node* node) {
         if (node == nullptr) return 0;
-        return getHeight(node->left) - getHeight(node->right);
+        return get_height(node->left) - get_height(node->right);
     }
 
-    Node* getMin(Node* node) {
+    Node* get_min(Node* node) {
         if (node == nullptr) return node;
         Node* res = node;
         while (res->left != nullptr)
@@ -125,20 +125,20 @@ private:
         else
             node->right = insert(node->right, key, val);
 
-        int bf = balanceFactor(node);
+        int bf = balance_factor(node);
         if (bf >= 2) {
-            int leftBf = balanceFactor(node->left);
-            if (balanceFactor(node->left) <= -1)
-                node->left = rotateLeft(node->left);
-            return rotateRight(node);
+            int left_bf = balance_factor(node->left);
+            if (balance_factor(node->left) <= -1)
+                node->left = rotate_left(node->left);
+            return rotate_right(node);
         } else if (bf <= -2) {
-            int rightBf = balanceFactor(node->right);
-            if (balanceFactor(node->right) >= 1)
-                node->right = rotateRight(node->right);
-            return rotateLeft(node);
+            int right_bf = balance_factor(node->right);
+            if (balance_factor(node->right) >= 1)
+                node->right = rotate_right(node->right);
+            return rotate_left(node);
         }
 
-        updateNode(node);
+        update_node(node);
         return node;
     }
 
@@ -150,13 +150,13 @@ private:
         } else if (comp(node->key, key)) {
             node->right = erase(node->right, key);
         } else {
-            int numChildren = (node->left != nullptr) + (node->right != nullptr);
+            int num_children = (node->left != nullptr) + (node->right != nullptr);
             if (node->left == nullptr || node->right == nullptr) {
                 Node* temp = node->left ? node->left : node->right;
                 delete node;
                 node = temp;
             } else {
-                Node* successor = getMin(node->right);
+                Node* successor = get_min(node->right);
                 node->key = successor->key;
                 node->val = successor->val;
                 node->right = erase(node->right, successor->key);
@@ -165,18 +165,18 @@ private:
 
         if (node == nullptr) return node;
 
-        int bf = balanceFactor(node);
+        int bf = balance_factor(node);
         if (bf >= 2) {
-            if (balanceFactor(node->left) <= -1)
-                node->left = rotateLeft(node->left);
-            return rotateRight(node);
+            if (balance_factor(node->left) <= -1)
+                node->left = rotate_left(node->left);
+            return rotate_right(node);
         } else if (bf <= -2) {
-            if (balanceFactor(node->right) >= 1)
-                node->right = rotateRight(node->right);
-            return rotateLeft(node);
+            if (balance_factor(node->right) >= 1)
+                node->right = rotate_right(node->right);
+            return rotate_left(node);
         }
 
-        updateNode(node);
+        update_node(node);
         return node;
 
     }
@@ -204,29 +204,29 @@ public:
         }
     }
 
-    AVLTree(const AVLTree& toCopy) : comp(toCopy.comp) {
-        if (toCopy.root == nullptr) return;
+    AVLTree(const AVLTree& to_copy) : comp(to_copy.comp) {
+        if (to_copy.root == nullptr) return;
 
-        root = new Node(*(toCopy.root));
+        root = new Node(*(to_copy.root));
         std::stack<std::pair<Node*, Node*>> st;
-        st.emplace(root, toCopy.root);
+        st.emplace(root, to_copy.root);
         while (!st.empty()) {
-            auto [newNode, oldNode] = st.top(); st.pop();
-            if (oldNode->left) {
-                newNode->left = new Node(*(oldNode->left));
-                st.emplace(newNode->left, oldNode->left);
+            auto [new_node, old_node] = st.top(); st.pop();
+            if (old_node->left) {
+                new_node->left = new Node(*(old_node->left));
+                st.emplace(new_node->left, old_node->left);
             }
-            if (oldNode->right) {
-                newNode->right = new Node(*(oldNode->right));
-                st.emplace(newNode->right, oldNode->right);
+            if (old_node->right) {
+                new_node->right = new Node(*(old_node->right));
+                st.emplace(new_node->right, old_node->right);
             }
         }
     }
 
-    AVLTree& operator=(const AVLTree& toCopy) {
-        if (this == &toCopy) return *this;
+    AVLTree& operator=(const AVLTree& to_copy) {
+        if (this == &to_copy) return *this;
 
-        AVLTree temp(toCopy);
+        AVLTree temp(to_copy);
         std::swap(root, temp.root);
         std::swap(comp, temp.comp);
         return *this;
@@ -252,19 +252,19 @@ public:
         root = erase(root, key);
     }
 
-    std::pair<Key, Value> getKth(int k) {
+    std::pair<Key, Value> get_kth(int k) {
         k++; // Change to 1-indexed
 
         assert(root != nullptr && k >= 0 && k <= root->weight);
 
         Node* cur = root;
         while (k > 0) {
-            if (k == getWeight(cur->left) + 1) {
+            if (k == get_weight(cur->left) + 1) {
                 return {cur->key, cur->val};
-            } else if (k <= getWeight(cur->left)) {
+            } else if (k <= get_weight(cur->left)) {
                 cur = cur->left;
             } else {
-                k -= getWeight(cur->left) + 1;
+                k -= get_weight(cur->left) + 1;
                 cur = cur->right;
             }
         }
@@ -273,33 +273,33 @@ public:
     }
 
     void print() {
-        std::function<void(Node*)> printFunc = [=](Node* node) {
+        std::function<void(Node*)> print_func = [=](Node* node) {
             std::cout << '(' << node->key << ": " << node->val << ")\n";
         };
-        print(root, printFunc);
+        print(root, print_func);
     }
 
     std::pair<Key, Value> operator[](int index) {
-        return getKth(index);
+        return get_kth(index);
     }
 };
 
 int main() {
     AVLTree<int, int> tree;
-    std::vector<int> toInsert = {10, 5, 2, 7, 3, 50, 25};
-    for (int num : toInsert) {
+    std::vector<int> to_insert = {10, 5, 2, 7, 3, 50, 25};
+    for (int num : to_insert) {
         tree.insert(num, num);
     }
     tree.print();
     std::cout << '\n';
 
-    for (int i = 0; i < toInsert.size(); i++) {
-        std::cout << tree.getKth(i) << '\n';
+    for (int i = 0; i < to_insert.size(); i++) {
+        std::cout << tree.get_kth(i) << '\n';
     }
     std::cout << '\n';
 
-    std::vector<int> toErase = {-1, 2, 7};
-    for (int num : toErase) {
+    std::vector<int> to_erase = {-1, 2, 7};
+    for (int num : to_erase) {
         std::cout << "Erasing: " << num << '\n';
         tree.erase(num);
         tree.print();

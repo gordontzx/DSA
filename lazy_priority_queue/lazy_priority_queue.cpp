@@ -16,10 +16,10 @@ template <
     typename Hash = std::hash<T>,
     typename KeyEqual = std::equal_to<T>
 >
-class lazy_priority_queue {
+class LazyPriorityQueue {
 private:
     std::priority_queue<T, Container, Compare> pq;
-    std::unordered_multiset<T, Hash, KeyEqual> contains;    // If hashing leads to slow runtime just use a multiset.
+    std::unordered_multiset<T, Hash, KeyEqual> contains;    // If hashing leads to slow runtime just use a multiset instead of this class.
     std::size_t sz;
 
     void clean_top() {
@@ -29,7 +29,7 @@ private:
     }
 
 public:
-    lazy_priority_queue() : sz(0) {}
+    LazyPriorityQueue() : sz(0) {}
 
     std::size_t size() const { return sz; }
 
@@ -65,7 +65,7 @@ public:
 };
 
 int main() {
-    lazy_priority_queue<int> pq;
+    LazyPriorityQueue<int> pq;
 
     for (int i = 0; i < 10; i++) {
         pq.push(i);

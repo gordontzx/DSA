@@ -8,7 +8,7 @@ std::ostream& operator<<(std::ostream& out, const vector<T>& v) {
     return out;
 }
 
-vector<int> buildSuffixArray(const string& s) {
+vector<int> build_suffix_array(const string& s) {
     string t = s + '$';
     int n = t.size();
 
@@ -51,11 +51,11 @@ vector<int> buildSuffixArray(const string& s) {
     return p;
 }
 
-vector<int> buildLcp(string_view s, const vector<int>& suffixArray) {
+vector<int> build_lcp(string_view s, const vector<int>& suffix_array) {
     int n = s.size();
     vector<int> rank(n);
     for (int i = 0; i < n; i++)
-        rank[suffixArray[i]] = i;
+        rank[suffix_array[i]] = i;
 
     vector<int> lcp(n);
     for (int i = 0, h = 0; i < n; i++) {
@@ -64,7 +64,7 @@ vector<int> buildLcp(string_view s, const vector<int>& suffixArray) {
             continue;
         }
 
-        int j = suffixArray[rank[i]+1];
+        int j = suffix_array[rank[i]+1];
         while (i+h < n && j+h < n && s[i+h] == s[j+h])
             h++;
         lcp[rank[i]] = h;
@@ -74,19 +74,19 @@ vector<int> buildLcp(string_view s, const vector<int>& suffixArray) {
     return lcp;
 }
 
-pair<int, int> findPatternNaive(string_view pattern, string_view s, const vector<int>& suffixArray) {
+pair<int, int> find_pattern_naive(string_view pattern, string_view s, const vector<int>& suffix_array) {
     int n = s.size();
 
     // Find lower bound
     int l = 0, r = n-1;
     while (l < r) {
         int m = (l+r)/2;
-        if (pattern <= s.substr(suffixArray[m], pattern.size()))
+        if (pattern <= s.substr(suffix_array[m], pattern.size()))
             r = m;
         else
             l = m+1;
     }
-    if (pattern != s.substr(suffixArray[l], pattern.size()))
+    if (pattern != s.substr(suffix_array[l], pattern.size()))
         return {-1, -1};
     int lo = l;
 
@@ -94,7 +94,7 @@ pair<int, int> findPatternNaive(string_view pattern, string_view s, const vector
     l = 0, r = n-1;
     while (l < r) {
         int m = (l+r+1)/2;
-        if (pattern >= s.substr(suffixArray[m], pattern.size()))
+        if (pattern >= s.substr(suffix_array[m], pattern.size()))
             l = m;
         else
             r = m-1;
@@ -104,11 +104,11 @@ pair<int, int> findPatternNaive(string_view pattern, string_view s, const vector
     return {lo, hi};
 }
 
-bool hasPattern(string_view pattern, string_view s, const vector<int>& suffixArray) {
+bool has_pattern(string_view pattern, string_view s, const vector<int>& suffix_array) {
     int l = 0, r = s.size()-1;
     while (l <= r) {
         int m = (l+r)/2;
-        int cmp = pattern.compare(s.substr(suffixArray[m], pattern.size()));
+        int cmp = pattern.compare(s.substr(suffix_array[m], pattern.size()));
         if (cmp == 0)
             return true;
         else if (cmp > 0)
@@ -127,7 +127,7 @@ int precompute_lcp(int l, int r, vector<int>& l_lcp, vector<int>& r_lcp, const v
     return min(l_lcp[m], r_lcp[m]);
 }
 
-int findPattern(string_view pattern, bool first, string_view s, const vector<int>& sa,
+int find_pattern(string_view pattern, bool first, string_view s, const vector<int>& sa,
         const vector<int>& l_lcp, const vector<int>& r_lcp) {
     // IsFirst is true iff return the left bound
 
@@ -163,20 +163,20 @@ int findPattern(string_view pattern, bool first, string_view s, const vector<int
 
 int main() {
     string s = "banana";
-    vector<int> suffixArray = buildSuffixArray(s);
-    vector<int> lcp = buildLcp(s, suffixArray);
+    vector<int> suffix_array = build_suffix_array(s);
+    vector<int> lcp = build_lcp(s, suffix_array);
 
     int n = s.size();
     // Print sorted suffixes
     for (int i = 0; i < s.size(); i++) {
-        cout << lcp[i] << ' ' << suffixArray[i] << ' ' << s.substr(suffixArray[i]) << '\n';
+        cout << lcp[i] << ' ' << suffix_array[i] << ' ' << s.substr(suffix_array[i]) << '\n';
     }
 
     vector<int> l_lcp(n), r_lcp(n);
     precompute_lcp(0, n-1, l_lcp, r_lcp, lcp);
 
     string pat = "an";
-    int l = findPattern(pat, true, s, suffixArray, l_lcp, r_lcp);
-    int r = findPattern(pat, false, s, suffixArray, l_lcp, r_lcp);
+    int l = find_pattern(pat, true, s, suffix_array, l_lcp, r_lcp);
+    int r = find_pattern(pat, false, s, suffix_array, l_lcp, r_lcp);
     cout << l << ' ' << r << '\n';
 }

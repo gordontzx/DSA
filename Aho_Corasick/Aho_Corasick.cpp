@@ -7,11 +7,11 @@ struct Node {
     int next[K];
     int id = -1;
     int par;
-    char parChar;
+    char par_char;
     int link;
     int go[K];
 
-    Node(int par = -1, char parChar = -1) : par(par), parChar(parChar) {
+    Node(int par = -1, char par_char = -1) : par(par), par_char(par_char) {
         fill(begin(next), end(next), -1);
     }
 };
@@ -19,7 +19,7 @@ struct Node {
 vector<Node> trie;
 constexpr int ROOT = 0;
 
-void insertWord(const string& word, int wordId) {
+void insert_word(const string& word, int word_id) {
     int cur = ROOT;
     for (char c : word) {
         int nxt = trie[cur].next[c-'a'];
@@ -30,10 +30,10 @@ void insertWord(const string& word, int wordId) {
         }
         cur = nxt;
     }
-    trie[cur].id = wordId;
+    trie[cur].id = word_id;
 }
 
-void buildLinks() {
+void build_links() {
     queue<int> q;
     trie[ROOT].link = ROOT;
     for (int i = 0; i < K; i++) {
@@ -49,8 +49,8 @@ void buildLinks() {
         if (trie[cur].par == ROOT) {
             trie[cur].link = ROOT;
         } else {
-            int parLink = trie[trie[cur].par].link;
-            trie[cur].link = trie[parLink].go[trie[cur].parChar-'a'];
+            int par_link = trie[trie[cur].par].link;
+            trie[cur].link = trie[par_link].go[trie[cur].par_char-'a'];
         }
 
         for (int i = 0; i < K; i++) {
@@ -68,30 +68,30 @@ void buildLinks() {
 void build(const vector<string>& words) {
     trie.emplace_back();
     for (int i = 0; i < words.size(); i++)
-        insertWord(words[i], i);
-    buildLinks();
+        insert_word(words[i], i);
+    build_links();
 }
 
-void findWordsSlow(const string& text, const vector<string>& words) {
+void find_words_slow(const string& text, const vector<string>& words) {
     int m = words.size();
-    vector<bool> inText(m, false);
+    vector<bool> in_text(m, false);
 
     int cur = 0;
     for (char c : text) {
         cur = trie[cur].go[c-'a'];
         for (int u = cur; u != ROOT; u = trie[u].link) {
             if (trie[u].id != -1)
-                inText[trie[u].id] = true;
+                in_text[trie[u].id] = true;
         }
     }
 
     for (int i = 0; i < m; i++) {
-        if (inText[i])
+        if (in_text[i])
             cout << words[i] << '\n';
     }
 }
 
-void findWords(const string& text, const vector<string>& words) {
+void find_words(const string& text, const vector<string>& words) {
     vector<bool> visited(trie.size());
 
     // Mark visited nodes
@@ -104,17 +104,17 @@ void findWords(const string& text, const vector<string>& words) {
     // BFS from deepest nodes
     vector<vector<int>> depths({{ROOT}});
     while (true) {
-        vector<int> nextDepth;
+        vector<int> next_depth;
         for (int node : depths.back()) {
             for (int i = 0; i < K; i++) {
                 int nxt = trie[node].next[i];
                 if (nxt != -1) {
-                    nextDepth.push_back(nxt);
+                    next_depth.push_back(nxt);
                 }
             }
         }
-        if (nextDepth.empty()) break;
-        depths.push_back(std::move(nextDepth));
+        if (next_depth.empty()) break;
+        depths.push_back(std::move(next_depth));
     }
 
     while (!depths.empty()) {
@@ -127,16 +127,16 @@ void findWords(const string& text, const vector<string>& words) {
     }
 
     int m = words.size();
-    vector<bool> inText(m, false);
+    vector<bool> in_text(m, false);
 
     // Find all terminal nodes that are visited
     for (int u = 0; u < trie.size(); u++) {
         if (visited[u] && trie[u].id != -1)
-            inText[trie[u].id] = true;
+            in_text[trie[u].id] = true;
     }
 
     for (int i = 0; i < m; i++) {
-        if (inText[i])
+        if (in_text[i])
             cout << words[i] << '\n';
     }
 }
@@ -152,5 +152,5 @@ int main() {
 
     const string text = "aybabtu";
     const string text2 = "aabab";
-    findWords(text, words);
+    find_words(text, words);
 }

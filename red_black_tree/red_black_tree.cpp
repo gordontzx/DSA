@@ -28,9 +28,9 @@ private:
         Node(Key key, Value val, int8_t color = RED, int weight = 1)
             : key(key), val(val), color(color), weight(1) {}
 
-        Node(const Node* toCopy)
-            : key(toCopy->key), val(toCopy->val), color(toCopy->color),
-              weight(toCopy->weight), child(toCopy->child) {}
+        Node(const Node* to_copy)
+            : key(to_copy->key), val(to_copy->val), color(to_copy->color),
+              weight(to_copy->weight), child(to_copy->child) {}
     };
 
     Node* root;
@@ -190,7 +190,7 @@ private:
         delete node;
     }
 
-    Node* copyTree(const Node* node) {
+    Node* copy_tree(const Node* node) {
         if (node == nullptr) return nullptr;
         return new Node(node);
     }
@@ -202,32 +202,32 @@ public:
         free_tree(root);
     }
 
-    RedBlackTree(const RedBlackTree& toCopy)
-        : root(copyTree(toCopy.root)), comp(toCopy.comp) {}
+    RedBlackTree(const RedBlackTree& to_copy)
+        : root(copy_tree(to_copy.root)), comp(to_copy.comp) {}
 
     RedBlackTree& operator=(const RedBlackTree& toCopy) {
         if (this == &toCopy) return *this;
 
         free_tree(root);
-        root = copyTree(toCopy.root);
+        root = copy_tree(toCopy.root);
         comp = toCopy.comp;
 
         return *this;
     }
 
-    RedBlackTree(RedBlackTree&& toMove) noexcept
-        : root(toMove.root), comp(std::move(toMove.comp)) {
-        toMove.root = nullptr;
+    RedBlackTree(RedBlackTree&& to_move) noexcept
+        : root(to_move.root), comp(std::move(to_move.comp)) {
+        to_move.root = nullptr;
     }
 
-    RedBlackTree& operator=(RedBlackTree&& toMove) noexcept {
-        if (this == &toMove) return *this;
+    RedBlackTree& operator=(RedBlackTree&& to_move) noexcept {
+        if (this == &to_move) return *this;
 
         free_tree(root);
         root = nullptr;
 
-        std::swap(root, toMove.root);
-        std::swap(comp, toMove.comp);
+        std::swap(root, to_move.root);
+        std::swap(comp, to_move.comp);
 
         return *this;
     }
@@ -252,13 +252,13 @@ public:
 
         Node* cur = root;
         while (k > 0) {
-            int leftWeight = get_weight(cur->child[LEFT]);
-            if (k == 1 + leftWeight) {
+            int left_weight = get_weight(cur->child[LEFT]);
+            if (k == 1 + left_weight) {
                 return {cur->key, cur->val};
-            } else if (k <= leftWeight) {
+            } else if (k <= left_weight) {
                 cur = cur->child[LEFT];
             } else {
-                k -= 1 + leftWeight;
+                k -= 1 + left_weight;
                 cur = cur->child[RIGHT];
             }
         }
@@ -278,17 +278,17 @@ public:
         std::size_t ans = 0;
 
         Node* cur = root;
-        std::size_t leftWeight = 0;
+        std::size_t left_weight = 0;
 
         while (cur != nullptr) {
-            bool isEqual = !comp(key, cur->key) && !comp(cur->key, key);
-            if (isEqual) {
+            bool is_equal = !comp(key, cur->key) && !comp(cur->key, key);
+            if (is_equal) {
                 found = cur;
-                ans = leftWeight + get_weight(cur->child[LEFT]);
+                ans = left_weight + get_weight(cur->child[LEFT]);
             }
 
             if (comp(cur->key, key)) {
-                leftWeight += get_weight(cur->child[LEFT]) + 1;
+                left_weight += get_weight(cur->child[LEFT]) + 1;
                 cur = cur->child[RIGHT];
             } else {
                 cur = cur->child[LEFT];

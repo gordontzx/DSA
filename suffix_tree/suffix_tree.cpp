@@ -39,7 +39,7 @@ private:
     static constexpr char SENTINEL = 'z' + 1;
 
     vector<TrieNode> trie;
-    int nextId = 1;
+    int next_id = 1;
     int root = 0;
     string s;
 
@@ -71,7 +71,7 @@ private:
             return p.node;
 
         int l = trie[p.node].l, r = trie[p.node].r;
-        int mid = nextId++;
+        int mid = next_id++;
         trie.emplace_back(l, l+p.pos, trie[p.node].par);
         trie[trie[p.node].par].next[s[l]-'a'] = mid;
         trie[mid].next[s[l+p.pos]-'a'] = p.node;
@@ -91,32 +91,32 @@ private:
 
     void build() {
         int m = s.size();
-        Point activePoint{0, 0};
+        Point active_point{0, 0};
 
         for (int i = 0; i < m; i++) {
             while (true) {
                 // Check rule 3
-                Point nextPoint = go(activePoint, i, i+1);
-                if (nextPoint.node != -1) {
-                    activePoint = nextPoint;
+                Point next_point = go(active_point, i, i+1);
+                if (next_point.node != -1) {
+                    active_point = next_point;
                     break;
                 }
 
-                int splitId = split(activePoint);
-                int leaf = nextId++;
-                trie.emplace_back(i, m, splitId);
-                trie[splitId].next[s[i]-'a'] = leaf;
+                int split_id = split(active_point);
+                int leaf = next_id++;
+                trie.emplace_back(i, m, split_id);
+                trie[split_id].next[s[i]-'a'] = leaf;
 
-                activePoint.node = get_link(splitId);
-                activePoint.pos = trie[activePoint.node].len();
+                active_point.node = get_link(split_id);
+                active_point.pos = trie[active_point.node].len();
 
-                if (splitId == 0)
+                if (split_id == 0)
                     break;
             }
         }
     }
 
-    string getLabel(int l, int r) {
+    string get_label(int l, int r) {
         string res;
         for (int i = l; i <= r; i++) {
             res += (s[i] == SENTINEL ? '$' : s[i]);
@@ -127,27 +127,27 @@ private:
     void print(int node, string prefix) {
         cout << node << '\n';
 
-        int lastChild = -1;
-        int longestEdge = 0;
+        int last_child = -1;
+        int longest_edge = 0;
         for (int i = 0; i < 27; i++) {
-            int nextNode = trie[node].next[i];
-            if (nextNode != 0) {
-                lastChild = i;
-                longestEdge = max(longestEdge, trie[nextNode].r - trie[nextNode].l);
+            int next_node = trie[node].next[i];
+            if (next_node != 0) {
+                last_child = i;
+                longest_edge = max(longest_edge, trie[next_node].r - trie[next_node].l);
             }
         }
 
-        if (lastChild == -1) return;
+        if (last_child == -1) return;
 
         for (int i = 0; i < 27; i++) {
-            int childId = trie[node].next[i];
-            if (childId == 0) continue;
+            int child_id = trie[node].next[i];
+            if (child_id == 0) continue;
 
-            TrieNode& child = trie[childId];
-            string rightPadding = repeat("─", longestEdge - (child.r - child.l) + 1);
-            cout << prefix << (i == lastChild ? "└─" : "├─") << getLabel(child.l, child.r-1) << rightPadding;
-            string nextPrefix = prefix + (i == lastChild ? " " : "│") + string(longestEdge+2, ' ');
-            print(childId, nextPrefix);
+            TrieNode& child = trie[child_id];
+            string right_padding = repeat("─", longest_edge - (child.r - child.l) + 1);
+            cout << prefix << (i == last_child ? "└─" : "├─") << get_label(child.l, child.r-1) << right_padding;
+            string next_prefix = prefix + (i == last_child ? " " : "│") + string(longest_edge+2, ' ');
+            print(child_id, next_prefix);
         }
     }
 

@@ -5,46 +5,46 @@ class Trie {
 private:
     struct TrieNode {
         int next[26] = {};
-        string edgeLabel[26];
-        bool isTerminal = false;
+        string edge_label[26];
+        bool is_terminal = false;
     };
 
     static constexpr int ROOT = 0;
     vector<TrieNode> trie;
-    int nextId = 1;
+    int next_id = 1;
 
-    void print(int nodeId, const string prefix) {
+    void print(int node_id, const string prefix) {
         // │ ─ ├ └
-        cout << nodeId;
+        cout << node_id;
 
-        TrieNode& node = trie[nodeId];
-        if (node.isTerminal)
+        TrieNode& node = trie[node_id];
+        if (node.is_terminal)
             cout << "$";
         cout << '\n';
 
-        int lastChild = -1;
-        int longestLen = 0;
+        int last_child = -1;
+        int longest_len = 0;
         for (int i = 0; i < 26; i++) {
             if (node.next[i]) {
-                lastChild = i;
-                longestLen = max(longestLen, (int) node.edgeLabel[i].size());
+                last_child = i;
+                longest_len = max(longest_len, (int) node.edge_label[i].size());
             }
         }
 
-        if (lastChild == -1)
+        if (last_child == -1)
             return;
 
-        string nextPrefix = "│" + string(longestLen+2, ' ');
-        string lastPrefix(longestLen+3, ' ');
+        string next_prefix = "│" + string(longest_len+2, ' ');
+        string last_prefix(longest_len+3, ' ');
         for (int i = 0; i < 26; i++) {
             if (node.next[i] == 0) continue;
 
-            cout << prefix << (i == lastChild ? "└─" : "├─") << node.edgeLabel[i];
-            int dashes = longestLen - node.edgeLabel[i].size() + 1;
+            cout << prefix << (i == last_child ? "└─" : "├─") << node.edge_label[i];
+            int dashes = longest_len - node.edge_label[i].size() + 1;
             for (int j = 0; j < dashes; j++)
                 cout << "─";
 
-            print(node.next[i], prefix + (i == lastChild ? lastPrefix : nextPrefix));
+            print(node.next[i], prefix + (i == last_child ? last_prefix : next_prefix));
         }
     }
 
@@ -53,8 +53,8 @@ public:
         trie.emplace_back();
     }
 
-    Trie(int numWords) {
-        trie.reserve(1 + 2 * numWords);
+    Trie(int num_words) {
+        trie.reserve(1 + 2 * num_words);
         trie.emplace_back();
     }
 
@@ -69,42 +69,42 @@ public:
             // edge does not exist
             if (trie[cur].next[idx] == 0) {
                 trie.emplace_back();
-                int next = nextId++;
+                int next = next_id++;
                 trie[cur].next[idx] = next;
                 string label = word.substr(i);
-                trie[cur].edgeLabel[idx] = label;
+                trie[cur].edge_label[idx] = label;
                 cur = next;
                 break;
             }
 
-            const string edgeLabel = trie[cur].edgeLabel[idx];
+            const string edge_label = trie[cur].edge_label[idx];
             int j = 0;
-            for (; j < edgeLabel.size() && i < len; i++, j++) {
-                if (word[i] != edgeLabel[j])
+            for (; j < edge_label.size() && i < len; i++, j++) {
+                if (word[i] != edge_label[j])
                     break;
             }
 
             // Matched full edgeLabel
-            if (j == edgeLabel.size()) {
+            if (j == edge_label.size()) {
                 cur = trie[cur].next[idx];
                 continue;
             }
 
             // Matched partial edgeLabel, split edge
             trie.emplace_back();
-            int mid = nextId++;
-            trie[mid].next[edgeLabel[j] - 'a'] = trie[cur].next[idx];
-            trie[mid].edgeLabel[edgeLabel[j] - 'a'] = edgeLabel.substr(j);
+            int mid = next_id++;
+            trie[mid].next[edge_label[j] - 'a'] = trie[cur].next[idx];
+            trie[mid].edge_label[edge_label[j] - 'a'] = edge_label.substr(j);
             trie[cur].next[idx] = mid;
-            trie[cur].edgeLabel[idx] = edgeLabel.substr(0, j);
+            trie[cur].edge_label[idx] = edge_label.substr(0, j);
 
             cur = mid;
         }
 
-        trie[cur].isTerminal = true;
+        trie[cur].is_terminal = true;
     }
 
-    bool hasWord(const string& word) {
+    bool has_word(const string& word) {
         int len = word.size();
 
         int cur = ROOT;
@@ -114,21 +114,21 @@ public:
             TrieNode& node = trie[cur];
             if (node.next[idx] == 0)
                 return false;
-            const string& edgeLabel = node.edgeLabel[idx];
+            const string& edge_label = node.edge_label[idx];
             int j = 0;
-            for (; j < edgeLabel.size() && i < len; j++, i++) {
-                if (word[i] != edgeLabel[j])
+            for (; j < edge_label.size() && i < len; j++, i++) {
+                if (word[i] != edge_label[j])
                     return false;
             }
-            if (i == len && j != edgeLabel.size())
+            if (i == len && j != edge_label.size())
                 return false;
             cur = node.next[idx];
         }
 
-        return trie[cur].isTerminal;
+        return trie[cur].is_terminal;
     }
 
-    bool hasPrefix(const string& word) {
+    bool has_prefix(const string& word) {
         int len = word.size();
 
         int cur = ROOT;
@@ -139,9 +139,9 @@ public:
             if (node.next[idx] == 0)
                 return false;
 
-            const string& edgeLabel = node.edgeLabel[idx];
-            for (int j = 0; j < edgeLabel.size() && i < len; j++, i++) {
-                if (word[i] != edgeLabel[j])
+            const string& edge_label = node.edge_label[idx];
+            for (int j = 0; j < edge_label.size() && i < len; j++, i++) {
+                if (word[i] != edge_label[j])
                     return false;
             }
             cur = node.next[idx];
@@ -184,7 +184,7 @@ void test_trie() {
 
     // Check that inserted words are in trie
     for (const string& word : words) {
-        if (!trie.hasWord(word) || !trie.hasPrefix(word)) {
+        if (!trie.has_word(word) || !trie.has_prefix(word)) {
             cout << word << " not in trie!\n";
         }
     }

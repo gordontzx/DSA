@@ -5,8 +5,8 @@ class Trie {
 private:
     struct TrieNode {
         TrieNode* next[26];
-        string edgeLabel[26];
-        bool isTerminal;
+        string edge_label[26];
+        bool is_terminal;
     };
 
     TrieNode* root;
@@ -26,12 +26,12 @@ public:
             // Edge does not exist
             if (cur->next[idx] == nullptr) {
                 cur->next[idx] = new TrieNode();
-                cur->edgeLabel[idx] = word.substr(i);
+                cur->edge_label[idx] = word.substr(i);
                 cur = cur->next[idx];
                 break;
             }
 
-            const string& label = cur->edgeLabel[idx];
+            const string& label = cur->edge_label[idx];
             int j = 0;
             for (; j < label.size() && i < word.size(); i++, j++) {
                 if (word[i] != label[j])
@@ -46,17 +46,17 @@ public:
 
             TrieNode* mid = new TrieNode();
             mid->next[label[j] - 'a'] = cur->next[idx];
-            mid->edgeLabel[label[j] - 'a'] = label.substr(j);
+            mid->edge_label[label[j] - 'a'] = label.substr(j);
             cur->next[idx] = mid;
-            cur->edgeLabel[idx] = label.substr(0, j);
+            cur->edge_label[idx] = label.substr(0, j);
 
             cur = mid;
         }
 
-        cur->isTerminal = true;
+        cur->is_terminal = true;
     }
 
-    bool hasWord(const string& word) {
+    bool has_word(const string& word) {
         TrieNode* cur = root;
         int i = 0;
 
@@ -66,7 +66,7 @@ public:
             if (cur->next[idx] == nullptr)
                 return false;
 
-            const string& label = cur->edgeLabel[idx];
+            const string& label = cur->edge_label[idx];
             int j = 0;
             for (; j < label.size() && i < word.size(); i++, j++) {
                 if (word[i] != label[j])
@@ -79,10 +79,10 @@ public:
             cur = cur->next[idx];
         }
 
-        return cur->isTerminal;
+        return cur->is_terminal;
     }
 
-    bool hasPrefix(const string& prefix) {
+    bool has_prefix(const string& prefix) {
         TrieNode* cur = root;
         int i = 0;
 
@@ -92,7 +92,7 @@ public:
             if (cur->next[idx] == nullptr)
                 return false;
 
-            const string& label = cur->edgeLabel[idx];
+            const string& label = cur->edge_label[idx];
             int j = 0;
             for (; j < label.size() && i < prefix.size(); i++, j++) {
                 if (prefix[i] != label[j])
@@ -126,7 +126,7 @@ void test_trie() {
 
     // Check that inserted words are in trie
     for (const string& word : words) {
-        if (!trie.hasWord(word)) {
+        if (!trie.has_word(word)) {
             cout << word << " not in trie!\n";
         }
     }

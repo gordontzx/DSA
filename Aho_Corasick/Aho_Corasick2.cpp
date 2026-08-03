@@ -9,23 +9,23 @@ struct Node {
     int link;
 };
 
-int nextId = 1;
+int next_id = 1;
 Node trie[N+1];
 bool vis[N+1];
 bool ans[N+1];
 vector<int> graph[N+1];
 
-void insert(const string& word, int wordId) {
+void insert(const string& word, int word_id) {
     int cur = 0;
     for (char c : word) {
         int nxt = trie[cur].next[c-'a'];
         if (nxt == 0) {
-            nxt = nextId++;
+            nxt = next_id++;
             trie[cur].next[c-'a'] = nxt;
         }
         cur = nxt;
     }
-    trie[cur].id = wordId;
+    trie[cur].id = word_id;
 }
 
 void build() {
@@ -51,7 +51,7 @@ void build() {
         }
     }
 
-    for (int u = 1; u < nextId; u++) {
+    for (int u = 1; u < next_id; u++) {
         graph[trie[u].link].push_back(u);
     }
 }
@@ -68,7 +68,7 @@ bool dfs(int u) {
     return res;
 }
 
-void searchWords(const string& text, const vector<string>& words) {
+void search_words(const string& text, const vector<string>& words) {
     int cur = 0;
     for (char c : text) {
         cur = trie[cur].next[c-'a'];
@@ -93,5 +93,5 @@ int main() {
         insert(words[i], i);
     build();
 
-    searchWords(text, words);
+    search_words(text, words);
 }

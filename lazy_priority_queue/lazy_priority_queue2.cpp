@@ -14,7 +14,7 @@ template <
     typename Compare = std::less<T>,
     typename Container = std::vector<T>
 >
-class lazy_priority_queue {
+class LazyPriorityQueue {
 private:
     std::priority_queue<T, Container, Compare> pq;
     std::priority_queue<T, Container, Compare> to_erase;
@@ -28,7 +28,7 @@ private:
     }
 
 public:
-    lazy_priority_queue() : sz(0) {}
+    LazyPriorityQueue() : sz(0) {}
 
     std::size_t size() const { return sz; }
 
@@ -60,7 +60,7 @@ public:
 };
 
 int main() {
-    lazy_priority_queue<int> pq;
+    LazyPriorityQueue<int> pq;
 
     pq.push(10);
     pq.push(20);
