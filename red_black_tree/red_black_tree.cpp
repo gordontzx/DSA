@@ -243,6 +243,7 @@ public:
         if (root != nullptr)
             root->color = BLACK;
     }
+
     std::pair<Key, Value> operator[](std::size_t k) {
         k++; // Change to 1-indexed
 
